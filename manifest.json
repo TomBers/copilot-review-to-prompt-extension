@@ -26,6 +26,6 @@
       "run_at": "document_idle"
     }
   ],
-  "permissions": ["storage", "clipboardWrite"],
+  "permissions": ["clipboardWrite"],
   "host_permissions": ["https://github.com/*", "https://*.github.com/*"]
 }
