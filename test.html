@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Copilot Review to Prompt Extension</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #0d1117;
+      color: #c9d1d9;
+    }
+    h1 {
+      color: #58a6ff;
+    }
+    .test-section {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .code {
+      background: #0d1117;
+      padding: 10px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+    button {
+      background: #238636;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #2ea043;
+    }
+    #results {
+      margin-top: 20px;
+    }
+    .result-item {
+      background: #0d1117;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border-left: 3px solid #58a6ff;
+    }
+    .result-item h3 {
+      margin-top: 0;
+      color: #58a6ff;
+    }
+    .success {
+      border-left-color: #3fb950;
+    }
+    .error {
+      border-left-color: #f85149;
+    }
+  </style>
+</head>
+<body>
+  <h1>Copilot Review to Prompt Extension - Test Page</h1>
+
+  <div class="test-section">
+    <h2>Instructions</h2>
+    <ol>
+      <li>Load the extension in Chrome (chrome://extensions/)</li>
+      <li>This page simulates a GitHub PR page structure</li>
+      <li>Click "Run Tests" to verify extraction functions</li>
+      <li>Check the results below to see if the extension correctly identifies:
+        <ul>
+          <li>File paths</li>
+          <li>Line ranges</li>
+          <li>Copilot author detection</li>
+          <li>Review comments and suggestions</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div class="test-section">
+    <h2>Mock GitHub PR Structure</h2>
+    <p>This simulates the HTML structure from a real GitHub PR with Copilot reviews:</p>
+
+    <!-- Simulated GitHub PR turbo-frame -->
+    <turbo-frame id="review-thread-or-comment-id-1748126731" target="_top">
+      <details-collapsible>
+        <details-toggle data-catalyst="">
+          <details open="open" data-resolved="false" class="review-thread-component js-comment-container">
+            <summary></summary>
+              <div class="d-flex flex-items-center">
+                <span class="flex-auto mr-3 d-flex flex-items-center">
+                  <a href="/test/repo/pull/123/files#diff-abc123" class="text-mono text-small Link--primary">lib/example/component.ex</a>
+                </span>
+              </div>
+            </summary>
+            <div data-view-component="true">
+              <div class="f6 py-2 px-3 border-bottom d-flex flex-justify-between">
+                <div class="f6 color-fg-muted">
+                  Comment on lines
+                  <span class="js-multi-line-preview-start color-fg-success">+67</span>
+                  to
+                  <span class="js-multi-line-preview-end color-fg-success">+87</span>
+                </div>
+              </div>
+
+              <div class="blob-wrapper border-bottom">
+                <table class="diff-table" data-tab-size="4">
+                  <tbody>
+                    <tr>
+                      <td class="blob-num blob-num-addition empty-cell"></td>
+                      <td data-line-number="67" class="blob-num blob-num-addition"></td>
+                      <td class="blob-code blob-code-addition">
+                        <span class="blob-code-inner blob-code-marker-addition">
+                          <span class="pl-kos">&lt;</span><span class="pl-ent">label</span> class="..."<span class="pl-kos">&gt;</span>View Mode<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="blob-num blob-num-addition empty-cell"></td>
+                      <td data-line-number="68" class="blob-num blob-num-addition"></td>
+                      <td class="blob-code blob-code-addition">
+                        <span class="blob-code-inner blob-code-marker-addition">
+                          <span class="pl-kos">&lt;</span><span class="pl-ent">label</span> class="..."<span class="pl-kos">&gt;</span>
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="js-line-comments js-suggested-changes-container">
+                <div class="js-comments-holder">
+                  <div id="discussion_r2665050787" class="timeline-comment-group js-comment review-comment">
+                    <div class="ml-n1 flex-items-center flex-row-reverse clearfix d-flex">
+                      <h3 class="f5 text-normal d-flex flex-row gap-2">
+                        <div class="avatar">
+                          <svg height="16" viewBox="0 0 16 16" width="16" class="octicon octicon-copilot">
+                            <path d="M7.998 15.035c-4.562 0-7.873-2.914-7.998-3.749V9.338..."></path>
+                          </svg>
+                        </div>
+                        <strong class="ml-1 flex-self-center">
+                          <a class="author Link--primary text-bold" href="/apps/copilot-pull-request-reviewer">Copilot</a>
+                          <span class="Label Label--secondary">AI</span>
+                        </strong>
+                        <a href="#discussion_r2665050787" class="Link--secondary js-timestamp">
+                          <relative-time datetime="2026-01-06T14:09:27Z">40 minutes ago</relative-time>
+                        </a>
+                      </h3>
+                    </div>
+
+                    <div class="ml-5">
+                      <div class="edit-comment-hide">
+                        <task-lists disabled="" sortable="">
+                          <div class="comment-body markdown-body js-comment-body">
+                            <p dir="auto">The label elements at lines 67 and 68 create nested labels, which is invalid HTML. The outer label at line 68 wraps an input checkbox and the entire toggle, but line 67 creates a separate label for "View Mode" text. The "View Mode" text should be outside the clickable label, or use a different semantic element like a div or span with appropriate ARIA attributes.</p>
+                          </div>
+                        </task-lists>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </details-toggle>
+      </details-collapsible>
+    </turbo-frame>
+
+    <!-- Second example with structured suggestions -->
+    <turbo-frame id="review-thread-or-comment-id-1748126732" target="_top">
+      <details-collapsible>
+        <details-toggle>
+          <details open="open">
+            <summary>
+              <div>
+                <a href="/test/repo/pull/123/files#diff-xyz789" class="Link--primary">src/utils/helper.js</a>
+              </div>
+            </summary>
+            <div>
+              <div class="f6 color-fg-muted">
+                Comment on lines
+                <span class="js-multi-line-preview-start">+42</span>
+                to
+                <span class="js-multi-line-preview-end">+45</span>
+              </div>
+
+              <div class="js-comments-holder">
+                <div id="discussion_r2665050788" class="js-comment review-comment">
+                  <h3>
+                    <a class="author Link--primary" href="/apps/copilot-pull-request-reviewer">Copilot</a>
+                  </h3>
+                  <div class="edit-comment-hide">
+                    <div class="comment-body js-comment-body">
+                      <p>Consider the following improvements:</p>
+                      <ul>
+                        <li>Use async/await instead of callbacks</li>
+                        <li>Add error handling for the network request</li>
+                        <li>Cache the results to avoid redundant API calls</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </details-toggle>
+      </details-collapsible>
+    </turbo-frame>
+  </div>
+
+  <div class="test-section">
+    <h2>Actions</h2>
+    <button onclick="runTests()">Run Tests</button>
+    <button onclick="clearResults()">Clear Results</button>
+    <button onclick="window.location.reload()">Reload Page</button>
+  </div>
+
+  <div id="results"></div>
+
+  <script>
+    function addResult(title, content, isSuccess = true) {
+      const resultsDiv = document.getElementById('results');
+      const resultItem = document.createElement('div');
+      resultItem.className = `result-item ${isSuccess ? 'success' : 'error'}`;
+      resultItem.innerHTML = `
+        <h3>${isSuccess ? '✓' : '✗'} ${title}</h3>
+        <div class="code">${content}</div>
+      `;
+      resultsDiv.appendChild(resultItem);
+    }
+
+    function clearResults() {
+      document.getElementById('results').innerHTML = '';
+    }
+
+    function runTests() {
+      clearResults();
+
+      addResult('Test Environment', 'Running extraction tests on mock GitHub PR structure...', true);
+
+      // Test 1: Check if turbo-frames are found
+      const frames = document.querySelectorAll('turbo-frame[id^="review-thread-or-comment-id-"]');
+      addResult(
+        'Turbo Frame Detection',
+        `Found ${frames.length} turbo-frame(s):\n${Array.from(frames).map(f => f.id).join('\n')}`,
+        frames.length > 0
+      );
+
+      // Test 2: Check if comment roots are found
+      frames.forEach((frame, idx) => {
+        const comments = frame.querySelectorAll('article, .js-comment, div[id^="discussion_r"]');
+        addResult(
+          `Comment Roots in Frame ${idx + 1}`,
+          `Found ${comments.length} comment root(s):\n${Array.from(comments).map(c => c.id || c.className).join('\n')}`,
+          comments.length > 0
+        );
+      });
+
+      // Test 3: Check file path extraction
+      frames.forEach((frame, idx) => {
+        const fileLink = frame.querySelector('details-collapsible summary a, a.Link--primary');
+        const filePath = fileLink ? fileLink.textContent.trim() : 'NOT FOUND';
+        addResult(
+          `File Path Extraction - Frame ${idx + 1}`,
+          `File: ${filePath}`,
+          filePath !== 'NOT FOUND'
+        );
+      });
+
+      // Test 4: Check line number extraction
+      frames.forEach((frame, idx) => {
+        const startSpan = frame.querySelector('.js-multi-line-preview-start');
+        const endSpan = frame.querySelector('.js-multi-line-preview-end');
+        const start = startSpan ? startSpan.textContent.trim() : 'NOT FOUND';
+        const end = endSpan ? endSpan.textContent.trim() : 'NOT FOUND';
+        addResult(
+          `Line Range Extraction - Frame ${idx + 1}`,
+          `Lines: ${start} to ${end}`,
+          start !== 'NOT FOUND' && end !== 'NOT FOUND'
+        );
+      });
+
+      // Test 5: Check Copilot author detection
+      frames.forEach((frame, idx) => {
+        const comments = frame.querySelectorAll('.js-comment, div[id^="discussion_r"]');
+        comments.forEach((comment, commentIdx) => {
+          const authorLink = comment.querySelector('a.author');
+          const authorText = authorLink ? authorLink.textContent.trim() : 'NOT FOUND';
+          const isCopilot = authorText.toLowerCase().includes('copilot');
+          addResult(
+            `Copilot Author Detection - Frame ${idx + 1}, Comment ${commentIdx + 1}`,
+            `Author: ${authorText}\nIs Copilot: ${isCopilot}`,
+            isCopilot
+          );
+        });
+      });
+
+      // Test 6: Check comment body extraction
+      frames.forEach((frame, idx) => {
+        const comments = frame.querySelectorAll('.js-comment, div[id^="discussion_r"]');
+        comments.forEach((comment, commentIdx) => {
+          const body = comment.querySelector('.js-comment-body, .comment-body');
+          const bodyText = body ? body.textContent.trim().substring(0, 100) + '...' : 'NOT FOUND';
+          addResult(
+            `Comment Body Extraction - Frame ${idx + 1}, Comment ${commentIdx + 1}`,
+            `Body text:\n${bodyText}`,
+            body !== null
+          );
+        });
+      });
+
+      // Test 7: Check for list items in structured comments
+      const structuredComment = document.getElementById('discussion_r2665050788');
+      if (structuredComment) {
+        const lists = structuredComment.querySelectorAll('ul li, ol li');
+        addResult(
+          'Structured Suggestion Extraction',
+          `Found ${lists.length} list item(s):\n${Array.from(lists).map((li, i) => `${i + 1}. ${li.textContent.trim()}`).join('\n')}`,
+          lists.length > 0
+        );
+      }
+
+      addResult('Tests Complete', 'All extraction tests completed. Check results above.', true);
+    }
+
+    // Auto-run tests on page load
+    window.addEventListener('load', () => {
+      setTimeout(runTests, 500);
+    });
+  </script>
+</body>
+</html>

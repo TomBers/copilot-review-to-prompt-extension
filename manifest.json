@@ -1,7 +1,7 @@
 {
   "name": "Copilot Review to Prompt",
   "description": "Extract and structure GitHub Copilot review comments on PR pages into a selectable prompt.",
-  "version": "1.0",
+  "version": "1.1",
   "manifest_version": 3,
   "action": {
     "default_icon": "icons/copilot_llm_icon_16.png"
