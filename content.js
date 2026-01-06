@@ -125,13 +125,16 @@
   const findLineRangeInFrame = (frame) => {
     const nums = new Set();
 
-    // User specific selector for line text (e.g. "Lines 42-45")
+    // User specific selector for line text (e.g. "Lines 42-45" or "Comment on lines +67 to +87")
     const specificLineDiv = frame.querySelector(
       "details-collapsible details > div > div:first-child",
     );
     if (specificLineDiv) {
       const text = safeText(specificLineDiv);
-      const m = text.match(/Lines?\s+(\d+)(?:-(\d+))?/i);
+      // Match patterns like "Lines 42-45", "Line 42", "Comment on lines +67 to +87"
+      const m = text.match(
+        /(?:Lines?|on lines)\s+\+?(\d+)(?:\s*(?:-|to)\s*\+?(\d+))?/i,
+      );
       if (m) {
         const start = parseInt(m[1], 10);
         const end = m[2] ? parseInt(m[2], 10) : start;
@@ -140,6 +143,17 @@
       }
     }
 
+    // Look for span elements with line numbers (e.g. .js-multi-line-preview-start, .js-multi-line-preview-end)
+    frame
+      .querySelectorAll(
+        '.js-multi-line-preview-start, .js-multi-line-preview-end, [class*="preview-start"], [class*="preview-end"]',
+      )
+      .forEach((el) => {
+        const text = safeText(el).replace(/^\+/, ""); // Remove leading + sign
+        const n = parseInt(text, 10);
+        if (!Number.isNaN(n)) nums.add(n);
+      });
+
     // Common patterns in GitHub's DOM
     frame.querySelectorAll("[data-line-number]").forEach((el) => {
       const n = parseInt(el.getAttribute("data-line-number"), 10);
@@ -147,7 +161,8 @@
     });
 
     frame.querySelectorAll(".blob-num").forEach((el) => {
-      const n = parseInt(safeText(el), 10);
+      const text = safeText(el).replace(/^\+/, ""); // Remove leading + sign
+      const n = parseInt(text, 10);
       if (!Number.isNaN(n)) nums.add(n);
     });
 
@@ -407,6 +422,15 @@
     const changeBlocks = extractSuggestedChangeBlocks(body);
 
     const combined = dedupe([...liItems, ...patternLines, ...changeBlocks]);
+
+    // If no structured suggestions found, treat the entire comment text as a suggestion
+    if (combined.length === 0) {
+      const plainText = safeText(body);
+      if (plainText && plainText.length > 10) {
+        combined.push(plainText);
+      }
+    }
+
     return combined;
   };
 
